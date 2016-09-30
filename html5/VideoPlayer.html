@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html>
+<body>
+
+<head>
+  <link rel = "stylesheet" href = "VideoPlyerStyle.css">
+</head>
+
+<video id = "video" width = "400" controls>
+	<source src = "algues.mp4" type = "video/mp4">
+</video>
+
+<!-- <button id = "alert1" type ="button" onclick = "alertClickHandle()">Alert1</button> 
+
+<input id = "alert1V" type = "number" value = 20> 
+
+-->
+<br>
+
+
+<input type = "file", onchange = "handleFileSelect(this.files[0])"></input> 
+
+<button id = "onJson" type ="button" >Export</button> <br>
+
+<p id = "typeOfAlert"> Type of Alert</p> <br>
+
+
+<table id = "alertTable">
+	<tr>
+		<th>AlertNumber</th>
+		<th>Time</th>
+	</tr>
+<table>
+		
+
+<script>
+	var vid = document.getElementById("video");
+	vid.ontimeupdate = function(){videoTimeUpdateHandle()};
+	function videoTimeUpdateHandle(){
+		console.log(vid.currentTime);
+	}
+</script>
+
+<script>
+	function alertClickHandle(time){
+		var vid = document.getElementById("video");
+		//var alert = document.getElementById("time");
+		//console.log(alert.value);
+		vid.currentTime = time;
+	}
+</script>
+
+<script>
+	 function loadJSON(callback) {   
+
+		var xobj = new XMLHttpRequest();
+			xobj.overrideMimeType("application/json");
+			xobj.open('GET', 'fileImport.json', true); // Replace 'my_data' with the path to your file
+			xobj.onreadystatechange = function () {
+			  if (xobj.readyState == 4 && xobj.status == "200") {
+				// Required use of an anonymous callback as .open will NOT return a value but simply returns undefined in asynchronous mode
+				callback(xobj.responseText);
+			  }
+		};
+		xobj.send(null);  
+	}
+	function OnJsonClickHandle1() {
+		loadJSON(function(response) {
+		// Parse JSON string into object
+		var actual_JSON = JSON.parse(response);
+		});
+		var test = document.getElementById("alert1V");
+		test.value = actual_JSON.type;
+	}
+	
+ </script>
+ 
+ <script>
+	var fr = new FileReader();
+	var fileImport;
+	var ALERT = {
+		'Immobility' : 0,
+		'Presence' : 1,
+		'Frequence' : 2,
+		'Escape' : 3,
+		'Fight' : 4,
+		'Sleep' : 5,
+		'StatusRecord' : 6,
+	}
+	
+	function handleFileSelect(f)
+	{               
+		if (window.File && window.FileReader && window.FileList && window.Blob) {
+
+		} else {
+			alert('The File APIs are not fully supported in this browser.');
+			return;
+		}   
+		fr.onloadend = receivedText;
+		fr.readAsText(f);
+	//	alert(fileImport);
+	}     
+
+	function receivedText(){
+		console.log("hihi");
+		fileImport = JSON.parse(fr.result);
+		var onJson = document.getElementById("onJson");
+		onJson.onclick = function(){onJsonClickHandle()};
+	}
+
+	function onJsonClickHandle() {
+		//alert(fileImport);
+		var alertName = document.getElementById("typeOfAlert");
+		alertName.innerHTML = stringEnum(ALERT, fileImport[0].type);
+		var i = 0;
+		while(fileImport[i] != null){
+			console.log(fileImport[i].type);
+			var button = document.createElement("button");
+			var td1 = document.createElement("td");
+			var td2 = document.createElement("td");
+			var tr = document.createElement("tr");
+			var table = document.getElementById("alertTable");
+			
+			table.appendChild(tr);
+			tr.appendChild(td1);
+			tr.appendChild(td2);
+			td1.appendChild(button);
+			td2.innerHTML = fileImport[i].time;
+			button.innerHTML = 'Alert' + i;
+			button.value = fileImport[i].time;
+			button.addEventListener('click', function(){alertClickHandle(this.value)})
+			//button.onclick = function(){alertClickHandle(fileImport[i].time)};
+			i++
+		}
+	} 
+	
+	function stringEnum(e, value){
+		for(var v in e){
+			if(e[v] == value){
+				return v;
+			}
+		}
+		return null;
+	}
+ </script>
+
+
+</body>
+</html>
